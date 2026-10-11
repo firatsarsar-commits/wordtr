@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useLanguage } from '../common/LanguageContext';
-import { curriculumData } from '@/lib/curriculum-data';
+import { useCurriculum } from '@/hooks/useCurriculum';
 import { PracticalAssignment, AssessmentResult } from '@/lib/types';
 import { createRealDocxBlob, downloadBlob } from '@/lib/docx/generator';
 import { parseDocxBuffer, evaluateDocumentRubric } from '@/lib/docx/analyzer';
@@ -31,8 +31,10 @@ interface PracticeLabViewProps {
 export function PracticeLabView({ initialAssignmentId }: PracticeLabViewProps) {
   const { language, t } = useLanguage();
   
-  // Flatten all 56+ assignments across all weeks
-  const allAssignments: PracticalAssignment[] = curriculumData.flatMap((w) => w.assignments);
+  const { curriculum } = useCurriculum();
+  
+  // Flatten all assignments across all weeks (dynamically reactive to curriculum overrides)
+  const allAssignments: PracticalAssignment[] = curriculum.flatMap((w) => w.assignments);
 
   const [selectedWeekFilter, setSelectedWeekFilter] = useState<number | 'all'>('all');
   const [selectedDifficultyFilter, setSelectedDifficultyFilter] = useState<'all' | 'beginner' | 'intermediate' | 'advanced'>('all');

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { LanguageProvider, useLanguage } from '@/components/common/LanguageContext';
+import { AuthProvider, useAuth } from '@/components/auth/AuthContext';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { HeroSection } from '@/components/home/HeroSection';
@@ -13,16 +14,19 @@ import { ExamCenterView } from '@/components/exams/ExamCenterView';
 import { QuestionBankManager } from '@/components/exams/QuestionBankManager';
 import { ResourcesView } from '@/components/resources/ResourcesView';
 import { AboutView } from '@/components/about/AboutView';
-import { AiAssistantWidget } from '@/components/assistant/AiAssistantWidget';
-import { curriculumData } from '@/lib/curriculum-data';
+import { StudentDashboardView } from '@/components/dashboard/student/StudentDashboardView';
+import { AdminDashboardView } from '@/components/dashboard/admin/AdminDashboardView';
+import { useCurriculum } from '@/hooks/useCurriculum';
 
 function MainAppContent() {
   const { language } = useLanguage();
+  const { role } = useAuth();
+  const { curriculum } = useCurriculum();
   const [activeTab, setActiveTab] = useState<string>('home');
   const [selectedWeekNum, setSelectedWeekNum] = useState<number>(1);
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null>(null);
 
-  const currentWeek = curriculumData.find((w) => w.weekNumber === selectedWeekNum) || curriculumData[0];
+  const currentWeek = curriculum.find((w) => w.weekNumber === selectedWeekNum) || curriculum[0];
   const currentTopic = language === 'tr' ? currentWeek.titleTr : currentWeek.titleEn;
 
   const handleStartLearning = () => {
@@ -83,6 +87,19 @@ function MainAppContent() {
           </div>
         )}
 
+        {/* NEW: Student Dashboard */}
+        {activeTab === 'student-dashboard' && (
+          <StudentDashboardView 
+            onNavigateToWeek={handleSelectWeek}
+            onNavigateToExam={handleTakeExam}
+          />
+        )}
+
+        {/* NEW: Administration Dashboard */}
+        {activeTab === 'admin-dashboard' && (
+          <AdminDashboardView />
+        )}
+
         {activeTab === 'curriculum' && (
           <WeeklyCurriculumView
             selectedWeekNum={selectedWeekNum}
@@ -112,12 +129,6 @@ function MainAppContent() {
         )}
       </main>
 
-      {/* Floating AI Assistant Widget in Bottom-Right */}
-      <AiAssistantWidget
-        currentWeek={selectedWeekNum}
-        currentTopic={currentTopic}
-      />
-
       {/* Global Footer */}
       <Footer setActiveTab={setActiveTab} />
 
@@ -128,7 +139,9 @@ function MainAppContent() {
 export default function Home() {
   return (
     <LanguageProvider>
-      <MainAppContent />
+      <AuthProvider>
+        <MainAppContent />
+      </AuthProvider>
     </LanguageProvider>
   );
 }

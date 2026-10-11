@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useLanguage } from '../common/LanguageContext';
-import { curriculumData } from '@/lib/curriculum-data';
+import { useCurriculum } from '@/hooks/useCurriculum';
 import { BookOpen, ArrowRight, Video, FileCheck, CheckCircle } from 'lucide-react';
 
 interface CurriculumOverviewProps {
@@ -11,6 +11,7 @@ interface CurriculumOverviewProps {
 
 export function CurriculumOverview({ onSelectWeek }: CurriculumOverviewProps) {
   const { language } = useLanguage();
+  const { curriculum } = useCurriculum();
 
   return (
     <section className="py-16 bg-white">
@@ -43,7 +44,7 @@ export function CurriculumOverview({ onSelectWeek }: CurriculumOverviewProps) {
 
         {/* 14 Weeks Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {curriculumData.map((week) => {
+          {curriculum.map((week) => {
             const title = language === 'tr' ? week.titleTr : week.titleEn;
             const tagline = language === 'tr' ? week.taglineTr : week.taglineEn;
             const videoCount = week.videos.length;
