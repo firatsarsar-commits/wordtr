@@ -183,6 +183,36 @@ export function authenticateUser(email: string, password: string): UserProfile |
   return found;
 }
 
+export function findUserByEmail(email: string): UserProfile | null {
+  const profiles = getAllProfiles();
+  return profiles.find(
+    (p) => p.email.toLowerCase().trim() === email.toLowerCase().trim()
+  ) || null;
+}
+
+export function resetUserPassword(
+  email: string, 
+  newPassword: string
+): { success: boolean; error?: string } {
+  const profiles = getAllProfiles();
+  const user = profiles.find(
+    (p) => p.email.toLowerCase().trim() === email.toLowerCase().trim()
+  );
+  if (!user) {
+    return { success: false, error: 'Bu e-posta adresine ait kayıtlı kullanıcı bulunamadı.' };
+  }
+  if (!newPassword || newPassword.length < 6) {
+    return { success: false, error: 'Yeni şifre en az 6 karakter olmalıdır.' };
+  }
+  user.password = newPassword;
+  setStorage(KEYS.PROFILES, profiles);
+  const current = getCurrentUser();
+  if (current && current.id === user.id) {
+    setCurrentUser(user);
+  }
+  return { success: true };
+}
+
 export function saveProfile(profile: UserProfile): void {
   const profiles = getAllProfiles();
   const index = profiles.findIndex((p) => p.id === profile.id);

@@ -8,7 +8,9 @@ import {
   getAllProfiles, 
   saveProfile,
   authenticateUser,
-  updateUserRole 
+  updateUserRole,
+  findUserByEmail,
+  resetUserPassword
 } from '@/lib/db/store';
 
 interface AuthContextType {
@@ -27,6 +29,8 @@ interface AuthContextType {
   assignUserRole: (targetUserId: string, newRole: UserRole) => { success: boolean; error?: string };
   allProfiles: UserProfile[];
   refreshProfiles: () => void;
+  checkEmailExists: (email: string) => boolean;
+  resetPassword: (email: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -125,6 +129,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return result;
   };
 
+  const checkEmailExists = (email: string): boolean => {
+    return Boolean(findUserByEmail(email));
+  };
+
+  const resetPassword = async (
+    email: string, 
+    newPassword: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    const result = resetUserPassword(email, newPassword);
+    if (result.success) {
+      refreshProfiles();
+    }
+    return result;
+  };
+
   const isMainAdmin = Boolean(
     currentUser && (currentUser.isMainAdmin || currentUser.email === 'admin@wordlabtr.edu.tr')
   );
@@ -142,6 +161,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         assignUserRole,
         allProfiles,
         refreshProfiles,
+        checkEmailExists,
+        resetPassword,
       }}
     >
       {children}
