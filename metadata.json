@@ -1,0 +1,6 @@
+{
+  "name": "WordLab TR",
+  "description": "WordLab TR: Etkileşimli Word Öğrenme Platformu - Üniversite öğrencileri için 14 haftalık müfredat, OOXML belge analizi, 50 soruluk deneme sınavı ve yapay zeka destekli eğitim asistanı.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
